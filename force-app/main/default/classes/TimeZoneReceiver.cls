@@ -1,7 +1,9 @@
 public with sharing class TimeZoneReceiver {
     
-    private static List<Double> getGeo(String address, String city, String state) {
-        String endpoint = 'https://maps.googleapis.com/maps/api/geocode/json?address=' +address+ ',+' +city+ ',+' +state+ '&key=AIzaSyBLSu2altBkaBeChLWVI5v9BB8FIqTOOjQ';
+    private static List<Double> getGeo(String city, String state) {
+        String cityWithoutSpaces = city.replace(' ', '+');
+        String stateWithoutSpaces = state.replace(' ', '+');
+        String endpoint = 'https://maps.googleapis.com/maps/api/geocode/json?address=,+' +cityWithoutSpaces+ ',+' +stateWithoutSpaces+ '&key=AIzaSyBLSu2altBkaBeChLWVI5v9BB8FIqTOOjQ';
         Http h = new Http();
         HttpRequest req = new HttpRequest();
         req.setEndpoint(endpoint);
@@ -26,26 +28,20 @@ public with sharing class TimeZoneReceiver {
 
     @future(callout = true)
     public static void populateAccountTimeZoneField(Set<Id> Ids) {
-        String address = '';
-        String city = '';
-        String state = '';
         List<Double> geocode = new List<Double>();
         Double latitude;
         Double longitude;
         String timezone = '';
-        List<Account> accList = [SELECT BillingStreet, BillingCity, BillingState, TimeZone__c FROM Account WHERE Id IN :Ids];
+        List<Account> accList = [SELECT ShippingCity, ShippingState, TimeZone__c FROM Account WHERE Id IN :Ids];
         for(Account accItem : accList){
-            address = accItem.BillingStreet.replace(' ', '+');
-            city = accItem.BillingCity.replace(' ', '+');
-            state = accItem.BillingState.replace(' ', '+');
             try{
-                geocode = getGeo(address, city, state);
+                geocode = getGeo(accItem.ShippingCity, accItem.ShippingState);
                 latitude = geocode[0];
                 longitude = geocode[1];
                 timezone = getTimeZone(latitude, longitude);
                 accItem.TimeZone__c = timezone;
             } catch (CalloutException ce){
-                accItem.TimeZone__c = 'Address Not Found';
+                accItem.TimeZone__c = 'City Not Found';
             }   
         }
         update accList;
