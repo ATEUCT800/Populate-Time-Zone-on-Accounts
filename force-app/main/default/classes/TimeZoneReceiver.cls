@@ -14,8 +14,11 @@ public with sharing class TimeZoneReceiver {
         }
         update accList;
     }
+
     private static String getTimeZone(String city, String state) {
-        String endpoint = 'https://vip.timezonedb.com/v2.1/get-time-zone?key=K1J4F2W6Z05T&format=json&by=city&city=' + city + '&region=' + state + '&country=US';
+        String cityWithoutSpaces = city.replace(' ', '+');
+        String stateWithoutSpaces = state.replace(' ', '+');
+        String endpoint = 'https://vip.timezonedb.com/v2.1/get-time-zone?key=K1J4F2W6Z05T&format=json&by=city&city=' + cityWithoutSpaces + '&region=' + stateWithoutSpaces + '&country=US';
         Http h = new Http();
         HttpRequest req = new HttpRequest();
         req.setEndpoint(endpoint);
@@ -23,6 +26,7 @@ public with sharing class TimeZoneReceiver {
         System.debug('endpoint = ' + endpoint);
         HttpResponse res = h.send(req);
         Map<String, Object> locationMap = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
+        System.debug('locationMap = ' + locationMap);
         if((String)locationMap.get('status') == 'FAILED'){
             System.debug('locationMap = ' + locationMap);
             throw new CalloutException('We couldn\'t find such address!');

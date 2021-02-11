@@ -19,9 +19,9 @@ public with sharing class AccountTrH {
         Set<Id> newUpdAccIds = new Set<Id>(); 
         List<String> states = new List<String> {'TX','AK','TN','SD','OR','ND','NE','MI','KY','KS','IN','ID','FL'};
         for(Account accItem : newRecords){
-            if(accItem.ShippingState != null && accItem.TimeZone__c == null/* (accItem.ShippingStreet != oldAccountMap.get(accItem.Id).ShippingStreet ||
+            if(accItem.ShippingState != null && /*accItem.TimeZone__c == null*/ (accItem.ShippingStreet != oldAccountMap.get(accItem.Id).ShippingStreet ||
                     accItem.ShippingCity != oldAccountMap.get(accItem.Id).ShippingCity ||
-                    accItem.ShippingState != oldAccountMap.get(accItem.Id).ShippingState )*/) {                        
+                    accItem.ShippingState != oldAccountMap.get(accItem.Id).ShippingState )) {                        
                         for (String s : states) {
        					if(accItem.ShippingState.contains(s)){
               		newUpdAccIds.add(accItem.Id);  
