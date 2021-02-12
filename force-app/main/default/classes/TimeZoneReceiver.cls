@@ -1,5 +1,5 @@
 public with sharing class TimeZoneReceiver {
-    
+ 
     @future(callout = true)
     public static void populateAccountTimeZoneField(Set<Id> Ids) {
         String timezone = '';
@@ -34,6 +34,15 @@ public with sharing class TimeZoneReceiver {
         List<Object> locationList = (List<Object>) locationMap.get('zones');
         locationMap = (Map<String, Object>)locationList[0];
         String timezone = (String) locationMap.get('abbreviation');
-        return timezone;
+        return getTimeZoneFullName(timezone);
+    }
+
+    private static String getTimeZoneFullName(String TimeZoneAbbr){
+        Map<String, String> mapTimeZoneAbbr = new Map<String, String>{'EST' => 'Eastern Standard Time', 'EDT' => 'Eastern Daylight Time', 'CST' => 'Central Standard Time', 'CDT' => 'Central Daylight Time', 'MST' => 'Mountain Standard Time', 'MDT' => 'Mountain Daylight Time', 'PST' => 'Pacific Standard Time', 'PDT' => 'Pacific Daylight Time', 'AKST' => 'Alaska Time', 'AKDT' => 'Alaska Daylight Time', 'HST' => 'Hawaii Standard Time', 'HAST' => 'Hawaii-Aleutian Standard Time'};
+        if(mapTimeZoneAbbr.containsKey(TimeZoneAbbr)){
+            return mapTimeZoneAbbr.get(TimeZoneAbbr);
+        } else {
+            return TimeZoneAbbr;
+        }
     }
 }
